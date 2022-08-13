@@ -7,14 +7,14 @@ import {
   query,
   orderBy,
   limit,
-  doc,
-  getDoc,
 } from "firebase/firestore";
 import SendMessage from "./SendMessage";
 import { decrypt } from "../encryption";
 import { getDateTime } from "../functions";
 import DeleteMessage from "./DeleteMessage";
 import EditMessage from "./EditMessage";
+import { ref, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase";
 
 const { Content } = Layout;
 
@@ -24,6 +24,7 @@ function Chat(props) {
   const [messages, setMessages] = React.useState([]);
   const [participants, setParticipants] = React.useState([]);
   const [names, setNames] = React.useState([]);
+  const [avatars, setAvatars] = React.useState([]);
 
   React.useEffect(() => {
     const m = query(
@@ -49,12 +50,50 @@ function Chat(props) {
     );
   }, []);
 
+  function getUserAvatar(uid) {
+    if (participants.includes(uid)) {
+      return avatars[participants.indexOf(uid)];
+    } else {
+      const avatar = ref(storage, `avatars/${uid}.jpg`);
+      getDownloadURL(avatar)
+        .then((url) => {
+          console.log(
+            "%cSuccessfully loaded profile image for ${uid}!",
+            "color: lime;",
+            url
+          );
+          setAvatars((oldAvatars) => [...oldAvatars, url]);
+          return url;
+        })
+        .catch((error) => {
+          switch (error.code) {
+            case "storage/object-not-found":
+              console.log(
+                "%cDid not load profile image, it does not exist.",
+                "color: orange;"
+              );
+              return null;
+            default:
+              message.error(`Could not load profile image: ${error.code}`);
+              console.log(
+                "%cDid not load profile image:",
+                "color: red;",
+                error.code
+              );
+              return null;
+          }
+        });
+    }
+  }
+
   const messagesRender = messages.map(
-    ({ uid, id, text, photoURL, createdAt, isEdited }) => {
+    ({ uid, id, text, createdAt, isEdited }) => {
       text = decrypt(text);
       let dispName = "Loading...";
+      let pic = getUserAvatar(uid);
 
       if (participants.includes(uid)) {
+        // get name //
         dispName = names[participants.indexOf(uid)];
         let nameElement = document.getElementById(`name_${id}`);
         if (nameElement !== null) {
@@ -65,8 +104,13 @@ function Chat(props) {
             "color: orange;"
           );
         }
+
+        // get avatar //
+        // pic = avatars[participants.indexOf(uid)];
       } else {
         console.log("uid NOT included in participants:", uid);
+
+        // Get the name and add to list //
         let dispRef = getProfile(uid);
         dispRef.then((res) => {
           dispName = res.displayName;
@@ -75,6 +119,15 @@ function Chat(props) {
           setParticipants((oldParticipants) => [...oldParticipants, uid]);
           setNames((oldNames) => [...oldNames, dispName]);
         });
+
+        // Get the pic and add to list //
+        // let picRef = getUserAvatar(uid);
+        // picRef.then((res) => {
+        //   pic = res;
+        //   setAvatars((oldAvatars) => [...oldAvatars, pic]);
+        // });
+        // pic = getUserAvatar(uid);
+        // setAvatars((oldAvatars) => [...oldAvatars, pic]);
       }
 
       return (
@@ -101,7 +154,7 @@ function Chat(props) {
           )}
 
           <div className={`message${uid === user.uid ? " message-mine" : ""}`}>
-            <Avatar src={photoURL} />
+            <Avatar src={pic} />
             <div className="message-content">
               <div id={`name_${id}`} className="message-name">
                 {dispName}
@@ -127,6 +180,7 @@ function Chat(props) {
     <Content
       style={{
         margin: "0 16px",
+        textAlign: "-webkit-center",
       }}
     >
       <Breadcrumb
@@ -136,13 +190,7 @@ function Chat(props) {
       >
         <Breadcrumb.Item>Chat</Breadcrumb.Item>
       </Breadcrumb>
-      <div
-        className="site-layout-background chat"
-        style={{
-          padding: 24,
-          minHeight: 360,
-        }}
-      >
+      <div className="site-layout-background chat">
         {messagesRender}
         <div ref={scrollPoint}></div>
       </div>

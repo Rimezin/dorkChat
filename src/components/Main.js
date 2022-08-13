@@ -22,9 +22,10 @@ function getItem(label, key, icon, children) {
 }
 
 export default function Main(props) {
-  const { user, handleAuth, throwError, profile, getProfile, setModal } = props;
+  const { user, handleAuth, throwError, profile, getProfile, setModal, width } =
+    props;
   const [page, setPage] = React.useState("1");
-  const [collapsed, setCollapsed] = React.useState(false);
+  const [collapsed, setCollapsed] = React.useState(width > 412 ? false : true);
   const items = [
     getItem("Chats", "1", <MessageOutlined />),
     getItem(
@@ -43,6 +44,13 @@ export default function Main(props) {
     }
   }
 
+  // Listen for window size
+  React.useEffect(() => {
+    if (width <= 412) {
+      setCollapsed(true);
+    }
+  }, [width]);
+
   return (
     <Layout
       style={{
@@ -54,7 +62,7 @@ export default function Main(props) {
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
       >
-        <div className="logo">dorkChat</div>
+        {/* <div className="logo">dorkChat</div> */}
         <Menu
           theme="dark"
           defaultSelectedKeys={["1"]}
@@ -65,11 +73,13 @@ export default function Main(props) {
       </Sider>
       <Layout className="site-layout">
         <Header
-          className="site-layout-background"
+          className="site-layout-background header"
           style={{
             padding: 0,
           }}
-        />
+        >
+          <span className="logo">dorkChat</span>
+        </Header>
         {/* Chat */}
         {page === "1" && (
           <Chat
@@ -82,7 +92,15 @@ export default function Main(props) {
         )}
         {/* Profile */}
         {page === "2" && <Profile user={user} handleAuth={handleAuth} />}
-        <Footer>dorkChat ©2022 Created by Rimezin</Footer>
+        <Footer
+          style={{
+            fontSize: width <= 412 ? "0.7rem" : "0.85rem",
+            padding: width <= 412 ? "0" : "0.85rem",
+            textAlign: "center",
+          }}
+        >
+          dorkChat ©2022
+        </Footer>
       </Layout>
     </Layout>
   );

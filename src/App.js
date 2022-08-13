@@ -15,11 +15,20 @@ import { app, db } from "./firebase";
 import { Modal, message } from "antd";
 import Main from "./components/Main";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import useWindowSize from "./hooks/useWindowSize";
 
 function App() {
   const auth = getAuth(app);
   const [user, setUser] = React.useState({});
   const [profile, setProfile] = React.useState({});
+  const [width, height] = useWindowSize();
+  React.useEffect(() => {
+    // Console log for science //
+    console.log(
+      `%c~~ WINDOW SIZE ~~ w:${width}, h:${height}`,
+      "color: orange;"
+    );
+  }, [width, height]);
   const [modal, setModal] = React.useState({
     open: false,
     message: "Default Message",
@@ -246,6 +255,7 @@ function App() {
           profile={profile}
           getProfile={getProfile}
           setModal={setModal}
+          width={width}
         />
       ) : (
         <SignIn handleAuth={handleAuth} />

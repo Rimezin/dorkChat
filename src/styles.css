@@ -6,7 +6,7 @@
 .sign-in-container {
   align-items: center;
   text-align: -webkit-center;
-  margin-top: 25%;
+  margin-top: 10rem;
 }
 
 .sign-in-card {
@@ -36,6 +36,33 @@
   background: #fff;
 }
 
+.header {
+  text-align: center;
+}
+
+.logo {
+  font-family: "Rubik Iso", cursive;
+  font-size: 2rem;
+  font-weight: 600;
+  background: -webkit-linear-gradient(45deg, #0b4071, #1890ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  user-select: none;
+  transition: all 2s;
+}
+
+.logo:hover {
+  background: -webkit-linear-gradient(45deg, #126bbe, #18baff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.greeting {
+  margin: 1rem !important;
+}
+
 .form-label {
   font-size: 0.75rem;
 }
@@ -51,10 +78,17 @@
 }
 
 .chat {
-  padding: 24px;
+  padding: 1.5rem;
   min-height: 360px;
   max-height: 93%;
   overflow-y: auto;
+  max-width: 50rem;
+}
+
+@media screen and (max-width: 412px) {
+  .chat {
+    padding: 0.5rem;
+  }
 }
 
 .message {
@@ -161,4 +195,14 @@
 
 .message-button:hover {
   background-color: rgb(158, 158, 158);
+}
+
+@media screen and (max-width: 412px) {
+  .message-send {
+    right: 1rem;
+  }
+
+  #send-message-form {
+    width: 15rem;
+  }
 }

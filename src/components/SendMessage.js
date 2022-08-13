@@ -29,9 +29,14 @@ function SendMessage(props) {
       onFinish={handleSend}
       className="message-send"
       name="send-message-form"
+      autoComplete="off"
     >
       <Form.Item name="message">
-        <Input id="send-input" placeholder="type your message..." />
+        <Input
+          id="send-input"
+          placeholder="type your message..."
+          autoComplete="off"
+        />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit">

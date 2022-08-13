@@ -1,19 +1,47 @@
 import React from "react";
-import { Avatar, Form, Input, Layout, Breadcrumb, Button, message } from "antd";
-import {
-  MehOutlined,
-  MailOutlined,
-  KeyOutlined,
-  PictureOutlined,
-} from "@ant-design/icons";
+import { Form, Input, Layout, Breadcrumb, Button, message } from "antd";
+import { MehOutlined, MailOutlined, KeyOutlined } from "@ant-design/icons";
+import AvatarUpload from "./AvatarUpload";
+import { storage } from "../firebase";
+import { getDownloadURL, ref } from "firebase/storage";
+
 const { Content } = Layout;
 
 function Profile(props) {
   const { user, handleAuth } = props;
 
-  const [profileImage, setProfileImage] = React.useState(
-    user.photoURL !== null ? "" : user.photoURL
-  );
+  const [profileImage, setProfileImage] = React.useState(null);
+
+  React.useEffect(() => {
+    const avatar = ref(storage, `avatars/${user.uid}.jpg`);
+    getDownloadURL(avatar)
+      .then((url) => {
+        console.log(
+          "%cSuccessfully loaded profile image!",
+          "color: lime;",
+          url
+        );
+        setProfileImage(url);
+      })
+      .catch((error) => {
+        switch (error.code) {
+          case "storage/object-not-found":
+            console.log(
+              "%cDid not load profile image, it does not exist.",
+              "color: orange;"
+            );
+            return;
+          default:
+            message.error(`Could not load profile image: ${error.code}`);
+            console.log(
+              "%cDid not load profile image:",
+              "color: red;",
+              error.code
+            );
+            return;
+        }
+      });
+  }, []);
 
   function validate(v) {
     if (typeof v === "undefined") {
@@ -39,9 +67,9 @@ function Profile(props) {
     if (data.displayName !== user.displayName) {
       validData.displayName = data.displayName;
     }
-    if (data.photoURL !== user.photoURL) {
-      validData.photoURL = data.photoURL;
-    }
+    // if (data.photoURL !== user.photoURL) {
+    // validData.photoURL = profileImage;
+    // }
     if (JSON.stringify(validData).length > 2) {
       console.log("Saving profile:", validData);
       handleAuth("update", validData);
@@ -104,6 +132,7 @@ function Profile(props) {
           className={`form-label ${
             user.emailVerified ? "verified" : "missing"
           }`}
+          style={{ marginTop: "-1.5rem" }}
         >
           {user.emailVerified ? "Verified" : "Not verified!"}
           {!user.emailVerified && (
@@ -132,16 +161,13 @@ function Profile(props) {
         </Form.Item>
 
         {/* Profile Image */}
-        <Avatar src={profileImage} alt="Avatar" crossOrigin="anonymous" />
-        <Form.Item name="photoURL" label="Avatar">
-          <Input
-            prefix={<PictureOutlined />}
-            size="large"
-            onChange={(e) => {
-              setProfileImage(e.value);
-            }}
-            placeholder="url"
+        <Form.Item label="Avatar">
+          <AvatarUpload
+            user={user}
+            profileImage={profileImage}
+            setProfileImage={setProfileImage}
           />
+          <span className="form-label">{`Image requirements: JPG only, less than 2MB in size. Uploading a file will save it immediately.`}</span>
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">

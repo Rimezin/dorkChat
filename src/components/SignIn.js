@@ -11,8 +11,11 @@ function SignIn(props) {
 
   return (
     <div className="sign-in-container">
-      <span className="sign-in-title">dorkChat</span>
+      <span className="sign-in-title logo" style={{ fontSize: "3rem" }}>
+        dorkChat
+      </span>
       <Card className="sign-in-card">
+        <div className="greeting">Please sign in.</div>
         <Form
           onFinish={handleSubmit}
           className="sign-in-form"

@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/dorkChat/static/css/main.2c55b805.css",
-    "main.js": "/dorkChat/static/js/main.289cac11.js",
+    "main.css": "/dorkChat/static/css/main.53569352.css",
+    "main.js": "/dorkChat/static/js/main.b5ceacb6.js",
     "index.html": "/dorkChat/index.html",
-    "main.2c55b805.css.map": "/dorkChat/static/css/main.2c55b805.css.map",
-    "main.289cac11.js.map": "/dorkChat/static/js/main.289cac11.js.map"
+    "main.53569352.css.map": "/dorkChat/static/css/main.53569352.css.map",
+    "main.b5ceacb6.js.map": "/dorkChat/static/js/main.b5ceacb6.js.map"
   },
   "entrypoints": [
-    "static/css/main.2c55b805.css",
-    "static/js/main.289cac11.js"
+    "static/css/main.53569352.css",
+    "static/js/main.b5ceacb6.js"
   ]
 }
